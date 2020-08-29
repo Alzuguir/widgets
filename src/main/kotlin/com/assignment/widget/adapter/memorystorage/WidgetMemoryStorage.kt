@@ -1,7 +1,10 @@
 package com.assignment.widget.adapter.memorystorage
 
+import com.assignment.widget.domain.NotFoundException
 import com.assignment.widget.domain.domainobject.Widget
-import javassist.NotFoundException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -9,18 +12,17 @@ import java.util.*
 class WidgetMemoryStorage {
 
     private val memoryStorage: MutableMap<Long, Widget> = mutableMapOf()
+    private var id: Long = 0
 
     fun save(widgetToBeSaved: Widget): Widget =
-            widgetToBeSaved.copy(id = assignWidgetId(), lastModification = Date())
+            widgetToBeSaved.copy(id = id, lastModification = Date())
                     .let { widget ->
                         memoryStorage[widget.id] = widget
+                        id++
                         widget
                     }
 
     fun getWidgetById(id: Long): Widget = memoryStorage[id] ?: throw NotFoundException("Widget $id was not found")
-
-    private fun assignWidgetId(): Long =
-            memoryStorage.values.maxBy { widget -> widget.id }?.id?.plus(1) ?: 1
 
     fun updateWidget(widgetUpdate: Widget): Widget =
             getWidgetById(widgetUpdate.id).let { widget ->
@@ -38,12 +40,11 @@ class WidgetMemoryStorage {
             }
 
     fun deleteWidget(id: Long) {
-        val removed = memoryStorage.remove(id)
-        if (removed == null) throw NotFoundException("Widget $id was not found")
+        memoryStorage.remove(id) ?: throw NotFoundException("Widget $id was not found")
     }
 
-    fun getAllWidgets(): List<Widget> =
-            memoryStorage.values.toList()
+    fun getAllWidgets(pageable: Pageable): Page<Widget> =
+            PageImpl<Widget>(memoryStorage.values.toList().sortedBy { widget -> widget.zIndex }, pageable, memoryStorage.values.size.toLong())
 
     fun checkZIndexAlreadyExists(zIndex: Int): Boolean =
             memoryStorage.values.find { widget -> widget.zIndex == zIndex } != null

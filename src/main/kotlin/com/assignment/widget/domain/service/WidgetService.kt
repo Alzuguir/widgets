@@ -5,6 +5,8 @@ import com.assignment.widget.boundary.dto.CreateWidgetRequest
 import com.assignment.widget.boundary.dto.UpdateWidgetRequest
 import com.assignment.widget.domain.domainobject.Widget
 import com.assignment.widget.domain.service.mapper.WidgetMapper
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,8 +43,9 @@ class WidgetService(private val widgetAdapter: WidgetAdapter) {
     fun deleteWidget(id: Long): Unit =
             widgetAdapter.deleteWidget(id)
 
-    fun getAllWidgets(): List<Widget> =
-            widgetAdapter.getAllWidgets().sortedBy { widget -> widget.zIndex }
+    fun getAllWidgets(pageable: Pageable): Page<Widget> =
+            widgetAdapter.getAllWidgets(pageable)
+
 
     private fun bumpZIndexesAndCreateWidget(request: CreateWidgetRequest, zIndex: Int): Widget =
             widgetAdapter.bumpHigherAndEqualZIndexes(zIndex)
