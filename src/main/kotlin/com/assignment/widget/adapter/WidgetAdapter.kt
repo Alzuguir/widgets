@@ -36,10 +36,6 @@ class WidgetAdapter(
             if (databaseActive) widgetRepository.deleteById(id)
             else widgetMemoryStorage.deleteWidget(id)
 
-    fun getAllWidgetsSorted(): List<Widget> =
-            if (databaseActive) widgetRepository.findAll(Sort.by("zIndex"))
-            else widgetMemoryStorage.getAllWidgetsSorted()
-
     fun getAllWidgetsFilteredPagedSorted(pageable: Pageable, filter: FilterWidgetsRequest?): Page<Widget> =
             if (filter?.lowerLeftX != null && filter.lowerLeftY != null && filter.upperRightX != null && filter.upperRightY != null) {
                 if (databaseActive) widgetRepository.findAllPagedFilteredSorted(filter.lowerLeftX, filter.lowerLeftY, filter.upperRightX, filter.upperRightY, pageable)
