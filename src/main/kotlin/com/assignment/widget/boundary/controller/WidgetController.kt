@@ -1,6 +1,7 @@
 package com.assignment.widget.boundary.controller
 
 import com.assignment.widget.boundary.dto.CreateWidgetRequest
+import com.assignment.widget.boundary.dto.FilterWidgetsRequest
 import com.assignment.widget.boundary.dto.UpdateWidgetRequest
 import com.assignment.widget.domain.domainobject.Widget
 import com.assignment.widget.domain.service.WidgetService
@@ -33,8 +34,8 @@ class WidgetController(private val widgetService: WidgetService) {
             widgetService.deleteWidget(id)
 
     @GetMapping
-    fun getAll(@PageableDefault(page = 0, size = 10) pageable: Pageable): Page<Widget> =
-            widgetService.getAllWidgets(pageable)
+    fun getAll(@PageableDefault(page = 0, size = 10, sort = ["zIndex"]) pageable: Pageable, filter: FilterWidgetsRequest?): Page<Widget> =
+            widgetService.getAllWidgets(pageable, filter)
 
 
 }

@@ -1,10 +1,7 @@
 package com.assignment.widget.adapter.memorystorage
 
-import com.assignment.widget.domain.NotFoundException
 import com.assignment.widget.domain.domainobject.Widget
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.Pageable
+import com.assignment.widget.domain.exception.NotFoundException
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -22,7 +19,8 @@ class WidgetMemoryStorage {
                         widget
                     }
 
-    fun getWidgetById(id: Long): Widget = memoryStorage[id] ?: throw NotFoundException("Widget $id was not found")
+    fun getWidgetById(id: Long): Widget = memoryStorage[id]
+            ?: throw NotFoundException("Widget $id was not found")
 
     fun updateWidget(widgetUpdate: Widget): Widget =
             getWidgetById(widgetUpdate.id).let { widget ->
@@ -43,19 +41,20 @@ class WidgetMemoryStorage {
         memoryStorage.remove(id) ?: throw NotFoundException("Widget $id was not found")
     }
 
-    fun getAllWidgets(pageable: Pageable): Page<Widget> =
-            PageImpl<Widget>(memoryStorage.values.toList().sortedBy { widget -> widget.zIndex }, pageable, memoryStorage.values.size.toLong())
+    fun getAllWidgetsSorted(): List<Widget> =
+            memoryStorage.values.sortedBy { widget -> widget.zIndex }
 
     fun checkZIndexAlreadyExists(zIndex: Int): Boolean =
             memoryStorage.values.find { widget -> widget.zIndex == zIndex } != null
 
-    fun bumpHigherAndEqualZIndexes(zIndex: Int): Unit =
+    fun incrementHigherAndEqualZIndexes(zIndex: Int): Unit =
             memoryStorage.values.sortedBy { zIndex }
                     .forEach { widget ->
                         if (widget.zIndex >= zIndex)
                             memoryStorage.replace(widget.id, widget.copy(zIndex = widget.zIndex + 1))
                     }
 
-    fun getLowestZIndex(): Int =
+    fun findLowestZIndex(): Int =
             memoryStorage.values.minBy { widget -> widget.zIndex }?.zIndex ?: 0
+
 }

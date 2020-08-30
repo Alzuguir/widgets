@@ -5,10 +5,10 @@ import javax.persistence.*
 
 @Entity
 @Table(
-        name = "widget",
+        name = "widgets",
         uniqueConstraints = [
-            UniqueConstraint(name = "uc_name", columnNames = ["id"]),
-            UniqueConstraint(name = "uc_z_index", columnNames = ["z_index"])
+                UniqueConstraint(name = "uc_name", columnNames = ["id"]),
+                UniqueConstraint(name = "uc_z_index", columnNames = ["z_index"])
         ]
 )
 data class Widget(
