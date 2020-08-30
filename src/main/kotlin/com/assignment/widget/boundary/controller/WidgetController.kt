@@ -20,11 +20,12 @@ class WidgetController(private val widgetService: WidgetService) {
             widgetService.getWidgetById(id)
 
     @PostMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody request: CreateWidgetRequest): Widget =
             widgetService.createWidget(request)
 
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     fun update(@RequestBody request: UpdateWidgetRequest, @PathVariable id: Long): Widget =
             widgetService.updateWidget(request, id)
 
