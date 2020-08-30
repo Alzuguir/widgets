@@ -2,8 +2,11 @@ package com.assignment.widget.adapter
 
 import com.assignment.widget.adapter.memorystorage.WidgetMemoryStorage
 import com.assignment.widget.adapter.repository.WidgetRepository
+import com.assignment.widget.boundary.dto.FilterWidgetsRequest
 import com.assignment.widget.domain.domainobject.Widget
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 
@@ -36,6 +39,15 @@ class WidgetAdapter(
     fun getAllWidgetsSorted(): List<Widget> =
             if (databaseActive) widgetRepository.findAll(Sort.by("zIndex"))
             else widgetMemoryStorage.getAllWidgetsSorted()
+
+    fun getAllWidgetsFilteredPagedSorted(pageable: Pageable, filter: FilterWidgetsRequest?): Page<Widget> =
+            if (filter?.lowerLeftX != null && filter.lowerLeftY != null && filter.upperRightX != null && filter.upperRightY != null) {
+                if (databaseActive) widgetRepository.findAllPagedFilteredSorted(filter.lowerLeftX, filter.lowerLeftY, filter.upperRightX, filter.upperRightY, pageable)
+                else widgetMemoryStorage.getAllPagedFilteredSorted(pageable, filter.lowerLeftX, filter.lowerLeftY, filter.upperRightX, filter.upperRightY)
+            } else {
+                if (databaseActive) widgetRepository.findAllPagedSorted(pageable)
+                else widgetMemoryStorage.getAllPagedSorted(pageable)
+            }
 
     fun checkZIndexAlreadyExists(zIndex: Int): Boolean =
             if (databaseActive) widgetRepository.findByZIndex(zIndex) != null

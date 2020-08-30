@@ -3,12 +3,10 @@ package com.assignment.widget.boundary.controller
 import com.assignment.widget.WidgetTestFixtures
 import com.assignment.widget.boundary.AbstractIntegrationTest
 import com.assignment.widget.domain.domainobject.Widget
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.doNothing
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockito_kotlin.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.data.domain.Sort
+import org.springframework.data.domain.PageImpl
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -116,60 +114,38 @@ internal class WidgetControllerTest : AbstractIntegrationTest() {
             widgets.add(WidgetTestFixtures.createWidget(widgetIds[i], zIndexes[i]))
         }
 
-        whenever(widgetRepository.findAll(Sort.by("zIndex"))).thenReturn(widgets)
+        whenever(widgetRepository.findAllPagedSorted(any())).thenReturn(PageImpl<Widget>(widgets))
 
         // WHEN
         val mvcResult = this.mockMvc.perform(
                 MockMvcRequestBuilders
                         .get("/widgets")
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                        .param("sort", "zIndex,asc"))
 
         val response = mvcResult.andReturn().response.contentAsString
 
         //THEN
         mvcResult.andExpect(status().isOk)
         assertThat(response).contains("\"numberOfElements\":11")
-        assertThat(response).contains("\"sorted\":true")
-        assertThat(response).contains("\"size\":10")
-        assertThat(response).contains("\"totalPages\":2")
+        assertThat(response).contains("\"size\":11")
+        assertThat(response).contains("\"totalPages\":1")
+        verify(widgetRepository, times(1)).findAllPagedSorted(any())
     }
 
     @Test
     fun `Should filter widget area on get all paginated request`() {
         // GIVEN
-        val widgetInAreaIds = listOf(1L, 2L, 3L, 4L, 5L, 6L, 7L)
-        val widgetOutAreaIds = listOf(12L, 13L, 14L, 15L)
+        val widgetIds = listOf(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L)
         val zIndexes = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
-        val widgetsInArea = mutableListOf<Widget>()
-        val widgetsOutArea = mutableListOf<Widget>()
+        val widgets = mutableListOf<Widget>()
 
-        for (i in widgetInAreaIds.indices) {
-            widgetsInArea.add(WidgetTestFixtures.createWidget(
-                    id = widgetInAreaIds[i],
-                    zIndex = zIndexes[i],
-                    x = 50,
-                    y = 50,
-                    height = 20,
-                    width = 20
-            ))
+        for (i in widgetIds.indices) {
+            widgets.add(WidgetTestFixtures.createWidget(widgetIds[i], zIndexes[i]))
         }
 
-        for (i in widgetOutAreaIds.indices) {
-            widgetsOutArea.add(WidgetTestFixtures.createWidget(
-                    id = widgetOutAreaIds[i],
-                    zIndex = zIndexes[i],
-                    x = 50,
-                    y = 50,
-                    height = 300,
-                    width = 300
-            ))
-        }
-
-        val allWidgets = mutableListOf<Widget>()
-        allWidgets.addAll(widgetsInArea)
-        allWidgets.addAll(widgetsOutArea)
-
-        whenever(widgetRepository.findAll(Sort.by("zIndex"))).thenReturn(allWidgets)
+        whenever(widgetRepository.findAllPagedFilteredSorted(any(), any(), any(), any(), any()))
+                .thenReturn(PageImpl<Widget>(widgets))
 
         // WHEN
         val mvcResult = this.mockMvc.perform(
@@ -186,9 +162,9 @@ internal class WidgetControllerTest : AbstractIntegrationTest() {
 
         //THEN
         mvcResult.andExpect(status().isOk)
-        assertThat(response).contains("\"numberOfElements\":7")
-        assertThat(response).contains("\"sorted\":true")
-        assertThat(response).contains("\"size\":2")
-        assertThat(response).contains("\"totalPages\":4")
+        assertThat(response).contains("\"numberOfElements\":11")
+        assertThat(response).contains("\"size\":11")
+        assertThat(response).contains("\"totalPages\":1")
+        verify(widgetRepository, times(1)).findAllPagedFilteredSorted(any(), any(), any(), any(), any())
     }
 }

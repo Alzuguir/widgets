@@ -7,7 +7,6 @@ import com.assignment.widget.boundary.dto.UpdateWidgetRequest
 import com.assignment.widget.domain.domainobject.Widget
 import com.assignment.widget.domain.mapper.WidgetMapper
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class WidgetService(private val widgetAdapter: WidgetAdapter) {
 
+    @Transactional
     fun getWidgetById(id: Long): Widget =
             widgetAdapter.getWidgetById(id)
 
@@ -45,22 +45,12 @@ class WidgetService(private val widgetAdapter: WidgetAdapter) {
                         }
                     }
 
+    @Transactional
     fun deleteWidget(id: Long): Unit =
             widgetAdapter.deleteWidget(id)
 
+    @Transactional
     fun getAllWidgets(pageable: Pageable, filter: FilterWidgetsRequest?): Page<Widget> =
-            filterWidgets(filter)
-                    .let { widgets ->
-                        PageImpl<Widget>(widgets, pageable, widgets.size.toLong())
-                    }
-
-    private fun filterWidgets(filter: FilterWidgetsRequest?): List<Widget> =
-            if (filter?.lowerLeftX != null && filter.lowerLeftY != null && filter.upperRightX != null && filter.upperRightY != null)
-                widgetAdapter.getAllWidgetsSorted().filter { widget ->
-                    (widget.x - (widget.width / 2) >= filter.lowerLeftX && widget.y - (widget.height / 2) >= filter.lowerLeftY)
-                            && (widget.x + (widget.width / 2) <= filter.upperRightX && widget.y + (widget.height / 2) <= filter.upperRightY)
-                }
-            else
-                widgetAdapter.getAllWidgetsSorted()
+            widgetAdapter.getAllWidgetsFilteredPagedSorted(pageable, filter)
 
 }
