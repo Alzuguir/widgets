@@ -21,16 +21,18 @@ class WidgetService(private val widgetAdapter: WidgetAdapter) {
     @Transactional
     fun createWidget(request: CreateWidgetRequest): Widget =
             when {
-                request.zIndex == null ->
+                request.zIndex == null -> {
                     widgetAdapter.createWidget(WidgetMapper.mapCreateRequestToWidget(request, widgetAdapter.getLowestZIndex() - 1))
+                }
 
                 widgetAdapter.checkZIndexAlreadyExists(request.zIndex) -> {
                     widgetAdapter.incrementHigherAndEqualZIndexes(request.zIndex)
                             .let { widgetAdapter.createWidget(WidgetMapper.mapCreateRequestToWidget(request)) }
                 }
 
-                else ->
+                else -> {
                     widgetAdapter.createWidget(WidgetMapper.mapCreateRequestToWidget(request))
+                }
             }
 
     @Transactional

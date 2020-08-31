@@ -8,7 +8,9 @@ import com.nhaarman.mockito_kotlin.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 
 internal class WidgetServiceTest {
 
@@ -146,7 +148,9 @@ internal class WidgetServiceTest {
             widgets.add(WidgetTestFixtures.createWidget(widgetIds[i], zIndexes[i]))
         }
 
-        whenever(widgetAdapter.getAllWidgetsFilteredPagedSorted(any(), any())).thenReturn(PageImpl<Widget>(widgets))
+        whenever(widgetAdapter.getAllWidgetsFilteredPagedSorted(any(), any())).thenReturn(
+                PageImpl<Widget>(widgets, PageRequest.of(0, 10, Sort.Direction.ASC, "zIndex"), widgets.size.toLong()
+                ))
 
         //WHEN
         val widgetsResult = widgetService.getAllWidgets(Pageable.unpaged(), FilterWidgetsRequest())

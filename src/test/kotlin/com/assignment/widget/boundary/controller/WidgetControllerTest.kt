@@ -7,6 +7,7 @@ import com.nhaarman.mockito_kotlin.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -114,7 +115,9 @@ internal class WidgetControllerTest : AbstractIntegrationTest() {
             widgets.add(WidgetTestFixtures.createWidget(widgetIds[i], zIndexes[i]))
         }
 
-        whenever(widgetRepository.findAllPagedSorted(any())).thenReturn(PageImpl<Widget>(widgets))
+        whenever(widgetRepository.findAllPagedSorted(any())).thenReturn(
+                PageImpl<Widget>(widgets, PageRequest.of(0, 10), widgets.size.toLong())
+        )
 
         // WHEN
         val mvcResult = this.mockMvc.perform(
@@ -128,9 +131,27 @@ internal class WidgetControllerTest : AbstractIntegrationTest() {
         //THEN
         mvcResult.andExpect(status().isOk)
         assertThat(response).contains("\"numberOfElements\":11")
-        assertThat(response).contains("\"size\":11")
-        assertThat(response).contains("\"totalPages\":1")
+        assertThat(response).contains("\"size\":10")
+        assertThat(response).contains("\"totalPages\":2")
         verify(widgetRepository, times(1)).findAllPagedSorted(any())
+    }
+
+    @Test
+    fun `Should return BadRequest for page size over 500`() {
+        // GIVEN
+        val size = 501
+
+        // WHEN
+        val mvcResult = this.mockMvc.perform(
+                MockMvcRequestBuilders
+                        .get("/widgets")
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                        .param("sort", "zIndex,asc")
+                        .param("page", "0")
+                        .param("size", size.toString()))
+
+        //THEN
+        mvcResult.andExpect(status().isBadRequest)
     }
 
     @Test
@@ -145,7 +166,8 @@ internal class WidgetControllerTest : AbstractIntegrationTest() {
         }
 
         whenever(widgetRepository.findAllPagedFilteredSorted(any(), any(), any(), any(), any()))
-                .thenReturn(PageImpl<Widget>(widgets))
+                .thenReturn(PageImpl<Widget>(widgets, PageRequest.of(0, 5), widgets.size.toLong())
+                )
 
         // WHEN
         val mvcResult = this.mockMvc.perform(
@@ -155,7 +177,7 @@ internal class WidgetControllerTest : AbstractIntegrationTest() {
                         .param("lowerLeftY", "0")
                         .param("upperRightX", "200")
                         .param("upperRightY", "200")
-                        .param("size", "2")
+                        .param("size", "5")
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
 
         val response = mvcResult.andReturn().response.contentAsString
@@ -163,8 +185,8 @@ internal class WidgetControllerTest : AbstractIntegrationTest() {
         //THEN
         mvcResult.andExpect(status().isOk)
         assertThat(response).contains("\"numberOfElements\":11")
-        assertThat(response).contains("\"size\":11")
-        assertThat(response).contains("\"totalPages\":1")
+        assertThat(response).contains("\"size\":5")
+        assertThat(response).contains("\"totalPages\":3")
         verify(widgetRepository, times(1)).findAllPagedFilteredSorted(any(), any(), any(), any(), any())
     }
 }

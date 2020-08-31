@@ -1,0 +1,248 @@
+{
+	"info": {
+		"_postman_id": "9f959922-f782-45f7-91dd-4e135edbe0d8",
+		"name": "Widget",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Widgets By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/widgets/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"widgets",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Widgets Paginated",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/widgets?size=10&page=0&sort=zIndex,asc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"widgets"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "zIndex,asc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Widgets Paginated and FIltered",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/widgets?size=10&page=0&lowerLeftX=0&lowerLeftY=0&upperRightX=2000&upperRightY=2000&sort=zIndex,asc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"widgets"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "lowerLeftX",
+							"value": "0"
+						},
+						{
+							"key": "lowerLeftY",
+							"value": "0"
+						},
+						{
+							"key": "upperRightX",
+							"value": "2000"
+						},
+						{
+							"key": "upperRightY",
+							"value": "2000"
+						},
+						{
+							"key": "sort",
+							"value": "zIndex,asc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Widget",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"x\": 1,\n    \"y\": 1,\n    \"zIndex\": 0,\n    \"width\": 100,\n    \"height\": 100\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/widgets/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"widgets",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Widget",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"x\": 100,\n    \"y\": 300,\n    \"zIndex\": 0,\n    \"width\": 500,\n    \"height\": 600\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/widgets/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"widgets",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Widget",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/widgets/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"widgets",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Default Rate Limit",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bucket\": \"DEFAULT\",\n    \"limit\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/ratelimits/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"ratelimits",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update List Rate Limit",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bucket\": \"LIST\",\n    \"limit\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/ratelimits/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"ratelimits",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

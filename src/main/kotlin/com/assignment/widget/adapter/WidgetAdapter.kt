@@ -59,9 +59,7 @@ class WidgetAdapter(
 
     private fun incrementHigherAndEqualZIndexesH2(zIndex: Int) {
         widgetRepository.findByZIndexGreaterThanEqual(zIndex, Sort.by("zIndex"))
-                .forEach { widget ->
-                    if (widget.zIndex >= zIndex)
-                        widgetRepository.save(widget.copy(zIndex = widget.zIndex + 1))
-                }
+                .map { widget -> widget.copy(zIndex = widget.zIndex + 1) }
+                .let { widgetRepository.saveAll(it) }
     }
 }

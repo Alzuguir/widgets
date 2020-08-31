@@ -13,8 +13,7 @@ object WidgetMapper {
                     y = request.y,
                     height = request.height,
                     width = request.width,
-                    zIndex = request.zIndex ?: foregroundZIndex
-                    ?: throw RuntimeException("Widget zIndex property is not nullable"),
+                    zIndex = request.zIndex ?: foregroundZIndex ?: throw RuntimeException("Widget zIndex property is not nullable"),
                     lastModification = Date()
             )
 
